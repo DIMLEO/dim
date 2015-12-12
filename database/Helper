@@ -1,0 +1,41 @@
+
+========================================================================================================================
+DATATYPE
+inc     => PRIMARY KEY AND AUTO_INCREMENT
+int     => WITH SIZE DEFAULT(11)
+mint    => Medium Int
+sint    => Small Int
+tint    => Tiny Int
+blob
+bool
+char
+text
+string  => WITH SIZE VALUE DEFAULT(255)
+float
+double
+enum
+date
+datetime
+timestamp
+time
+========================================================================================================================
+
+========================================================================================================================
+Format Type
+
+#   is Type     property
+:   is size     property
+@   is null     property
+$   is default  property
+
+Exemple
+
+#int :10 @false $6
+//==> output {type: 'int', size: 10, null : false, default : 6}
+the space is not required
+
+the precedent query can be write like that
+
+#int:10@false$6
+//==> output {type: 'int', size: 10, null : false, default : 6}
+========================================================================================================================

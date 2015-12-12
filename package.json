@@ -1,0 +1,11 @@
+{
+  "name": "dim",
+  "version": "1.0.0",
+  "description": "Laravel structure For Express.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "Console.log('DIM Package')"
+  },
+  "author": "Diarra Mamadou",
+  "license": "MIT"
+}
