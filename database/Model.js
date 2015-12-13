@@ -1,13 +1,48 @@
-module.exports = function(params){
-    var config = params.connections[params.default];
-    var driver = params.default;
+module.exports = function(){
 
-    $datatype = require('./datatype');
+    this.$db = undefined;
 
-    //console.log(config, driver);
+    this.$tablename = '';
+    this.$prefix  = '';
 
-    $connection = require('./connector/'+driver)(config);
+    this.$columns = [];
+    this.$schema = {};
+    this.$relation = {};
+    this.$schema = {};
 
 
-    return 'oki';
+    this.definition = function($schema){
+        this.$schema = $schema;
+        for(var col in $schema)
+            this.$columns.push(col);
+    };
+
+    this.relation = function($relation){
+        var relation = undefined;
+        for(var table in $relation){
+            relation = $relation[table].toLowerCase();
+
+            if(relation == 'onetomany'){
+
+            }
+            else  if(relation == 'onetoone'){
+
+            }
+            else  if(relation == 'manytoone'){
+
+            }
+            else  if(relation == 'manytomany'){
+
+            }
+        }
+        delete relation;
+    };
+
+    this.extra = function($extra){
+        this.$extra = $extra;
+    };
+
+    this.init = function(){
+
+    }
 };

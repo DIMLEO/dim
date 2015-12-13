@@ -189,6 +189,7 @@ module.exports = function(env){
 
     function mkBlade(path, file, params){
         var sources = fs.readFileSync(path, "UTF-8");
+        sources = sources.replace(/`/, '\`');
         var $section = [], required = [], $block = [], $extends = '""', $html = [], useFs = false;
         if(!params) params = {};
         if(!params.__blade_private__) params.__blade_private__ = {};

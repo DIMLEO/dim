@@ -1,26 +1,125 @@
-module.exports = function(params){
+module.exports = function(config){
+    /*
+     * IF NO NAME RETURN NULL
+     */
+    if(config.name.length == 0) return null;
 
-/*
-    $ npm install pg
 
-    var pg = require('pg');
-    var conString = "postgres://username:password@localhost/database";
-
-    pg.connect(conString, function(err, client, done) {
-
-        if (err) {
-            return console.error('error fetching client from pool', err);
+    var call = function(){
+        for(var i in makeAfterConnect){
+            fn.sql(makeAfterConnect[i]);
         }
-        client.query('SELECT $1::int AS number', ['1'], function(err, result) {
-            done();
-            if (err) {
-                return console.error('error running query', err);
+    };
+    var makeAfterConnect = [];
+
+    var fn = require('./connector');
+    {
+        fn.isOpen = function(){
+            return pgclient != null;
+        };
+        fn.sql = function(q){
+            if(!q.query) return null;
+
+            if(!this.isOpen()){
+                makeAfterConnect.push(q);
+                return null;
             }
-            console.log(result.rows[0].number);
-        });
+            if(/^(INSERT|UPDATE|CREATE)/i.test(q.query)){
+                var done = pgclient.query(q.query, q.data);
+                if(done){
+                    if(q.success && is_function(q.success))q.success(done)
+                }else{
+                    if (q.error) q.error(done);
+                }
+            }else {
+                pgclient.query(q.query, q.data, function (err, result) {
+                    if (err) {
+                        if (!q.error)
+                            throw err;
+                        else
+                            q.error(err);
+                    }
+                    else if (q.success && is_function(q.success) && result) q.success(result.rows, result.fields);
 
+                });
+            }
+        };
+        fn.close = function(){
+            pgdone();
+        }
+    };
+
+    /*
+     * REQUIRED PG MODULE FOR THE CONNECTION WITH PLSQL
+     */
+    var pg = require('pg');
+
+    /*
+     * CREATE A CONNECTION STRING
+     */
+    var conString = "postgres://"+config.user+":"+config.password+"@"+config.host+":"+config.port+"/";
+
+    /*
+     * OPEN THE CONNECTION
+     */
+    var pgclient = null, pgdone = undefined, isload = false;
+
+    pg.connect(conString+config.name, function(err, client, done) {
+        if(err) {
+            pg.connect(conString+'postgres', function(err, client, done) {
+                if(err) {
+                    isload = true;
+                    console.error('postgres :: error fetching client from pool', err);
+                }else{
+                    /*
+                     * IF config.createIfNotExist IS TRUE CREATE AUTOMATIQUALY DATABASE WITH config.name
+                     * config.name is DATABASE NAME
+                     *
+                     * POSTGRES DATABASE SELECT
+                     */
+                    client.query('CREATE DATABASE '+ config.name, function (err) {
+                        if (err) throw err;
+                    });
+                    client.end();
+
+                    pg.connect(conString+config.name, function(err, client, done) {
+                        isload = true;
+                        if(err) console.error(config.name+' :: error fetching client from pool', err);
+                        else {
+                            pgclient = client;
+                            pgdone = done;
+                            call();
+                            console.log('connected to ' + config.name + ' database!');
+                        }
+                    });
+                }
+            });
+        }else{
+            isload = true;
+            pgclient = client;
+            pgdone = done;
+            call();
+            console.log('connected to '+config.name+' database!');
+        }
     });
+    //console.log(client)
 
-*/
+    /*
+     * IF config.createIfNotExist IS TRUE CREATE AUTOMATIQUALY DATABASE WITH config.name
+     * config.name is DATABASE NAME
+     *
+     * NOTE : NO DATABASE SELECT
+     */
+    if(config.createIfNotExist) {
+        //client.query('CREATE DATABASE '+ config.name, function (err) {
+        //    if (err) throw err;
+        //});
+    }
 
+    //, function(err, client, done) {
+
+    //
+    //});
+
+    return fn;
 };

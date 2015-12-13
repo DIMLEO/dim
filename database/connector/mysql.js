@@ -13,9 +13,11 @@ module.exports = function(config){
     /*
      * CREATE NEW CONNEXION WITH PARAMS
      */
+
     var connection = mysql.createConnection({
         host     : config.host,
         user     : config.user,
+        port     : config.port,
         password : config.password
     });
 
@@ -25,6 +27,7 @@ module.exports = function(config){
      * NOTE : NO DATABASE SELECT
      */
     connection.connect();
+
 
     /*
      * IF config.createIfNotExist IS TRUE CREATE AUTOMATIQUALY DATABASE WITH config.name
@@ -44,20 +47,39 @@ module.exports = function(config){
     connection.query('USE ' + config.name, function (err) {
         if (err) throw err;
     });
-    /*
 
-     $ npm install mysql
 
-     connection.connect();
-
-     connection.query('SELECT 1 + 1 AS solution', function(err, rows, fields) {
-     if (err) throw err;
-     console.log('The solution is: ', rows[0].solution);
-     });
-
-     connection.end();
-
-     */
-    return connection;
-
+    var connector = require('./connector');
+    {
+        connector.isOpen= function(){
+            return connection != null;
+        };
+        connector.sql = function(q){
+            if(!q.query) return null;
+            if(/^(INSERT|UPDATE|CREATE)/i.test(q.query)){
+                var done = connection.query(q.query, q.data);
+                if(done){
+                    if(q.success && is_function(q.success))q.success(done)
+                }else{
+                    if (q.error)
+                        q.error(done);
+                }
+            }
+            else {
+                connection.query(q.query, q.data, function (err, rows, fields) {
+                    if (err) {
+                        if (!q.error)
+                            throw err;
+                        else
+                            q.error(err);
+                    }
+                    else if (q.success && is_function(q.success) && rows && fields) q.success(rows, fields);
+                });
+            }
+        };
+        connector.close = function(){
+            connection.end();
+        };
+    }
+    return connector;
 };
