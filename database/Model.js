@@ -4,9 +4,10 @@ module.exports = function(params){
 
     $datatype = require('./datatype');
 
-    console.log(config, driver);
+    //console.log(config, driver);
 
     $connection = require('./connector/'+driver)(config);
+
 
     return 'oki';
 };

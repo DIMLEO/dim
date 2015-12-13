@@ -2,13 +2,14 @@ module.exports = function(config){
 
     var sqlite3 = require('sqlite3').verbose();
     var db = new sqlite3.Database((config.memory)?':memory:':config.folder+'/'+config.name);
-    db.serialize(function() {
-
+    db.serialize(function(){
+        console.log('Database is open');
     });
-/*
-    $ npm install sqlite3
 
+    return db;
 
+    /*
+        $ npm install sqlite3
 
         db.run('CREATE TABLE lorem (info TEXT)');
         var stmt = db.prepare('INSERT INTO lorem VALUES (?)');
@@ -22,10 +23,9 @@ module.exports = function(config){
         db.each('SELECT rowid AS id, info FROM lorem', function(err, row) {
             console.log(row.id + ': ' + row.info);
         });
-    });
 
-    db.close();
+        db.close();
 
-*/
+    */
 
 };
