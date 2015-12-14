@@ -1,6 +1,24 @@
+var getDefinition = function(attr, equivalent){
+    var temp;
+
+    type = attr.type.toLowerCase();
+    temp = equivalent.datatype[type];
+
+    if(type == 'enum'){
+        if(!attr.values) equivalent.defaultSize[type];
+        temp = temp.replace(/%values%/ig, (is_string(attr.values))?attr.values:'"'+attr.join('","')+'"');
+    }
+
+    temp = temp.replace(/%size%/ig,(attr.size)?attr.size:equivalent.defaultSize[type]);
+
+    return temp += (attr.null)? ' NULL ' : ' NOT NULL ';
+};
+
 module.exports = function(schema, equivalent, models){
 
-    var query = '', endQuery = '';
+    if(!models.relations)
+        models.relations = {};
+    var query = '';
 
     var defautExtra = {
         id : true,
@@ -26,7 +44,7 @@ module.exports = function(schema, equivalent, models){
      */
     else{
         query  = equivalent.table.create;
-        endQuery = '';
+        var foreignKey = [], endQuery = [],  associationTable = [];
 
         var attrs = schema.attrs;
         var relations = schema.relations;
@@ -42,7 +60,7 @@ module.exports = function(schema, equivalent, models){
                 defautExtra[index] = extra[index];
             }
 
-        var definition = [], attr = undefined, temp = '', type = '';
+        var definition = [];
 
         /*
          * if is true add id auto_increment column
@@ -73,37 +91,126 @@ module.exports = function(schema, equivalent, models){
         }
 
         for(index in attrs){
-            attr = attrs[index];
-            type = attr.type.toLowerCase();
-            temp = equivalent.datatype[type];
-
-            if(type == 'enum'){
-                if(!attr.values) equivalent.defaultSize[type];
-                temp = temp.replace(/%values%/i, (is_string(attr.values))?attr.values:'"'+attr.join('","')+'"');
+            if((new RegExp('\\b'+index+'\\b')).test(equivalent.keyswords)){
+                throw new Error('a keyword '+index+' is used by the data base management system');
+                return;
             }
-
-            temp = temp.replace(/%size%/i,(attr.size)?attr.size:equivalent.defaultSize[type]);
-
-            temp += (attr.null)? ' NULL ' : ' NOT NULL ';
-
-            definition.push(index+' '+temp);
+            definition.push(index+' '+getDefinition(attrs[index], equivalent));
         }
+        //console.log(definition)
 
         /*
          * add relatioons query if required
          */
+        var relation = undefined;
         for(index in relations){
 
+            relation = relations[index].toLowerCase();
+            if(relation == 'manytoone' || relation == 'onetoone'){
+                foreignKey.push(index);
+                definition.push(index+'_id '+equivalent.datatype['int'].replace(/%size%/i, 11));
+                definition.push( equivalent.table.foreignkey.replace(/%colname%/ig, index+'_'+defautExtra.idName)
+                    .replace(/%tablename%/ig, schema.name.toLowerCase())
+                    .replace(/%fromtablename%/ig, index.toLowerCase())
+                    .replace(/%fromcolname%/ig, defautExtra.idName));
+                models.relations[index] = {
+                    name : index+'_'+defautExtra.idName,
+                    d : 'in',
+                    n : (relation == 'manytoone')?'many':'one'
+                };
+            }
+            else if(relation == 'onetomany'){
+                foreignKey.push(index);
+                var name = schema.name.toLowerCase();
+                var alter = equivalent.table.alter.query.replace(/%tablename%/i, index);
+
+                endQuery.push(alter+' '+equivalent.table.alter.add.replace(/%colname%/i, name+'_'+defautExtra.idName).replace(/%definition%/i,equivalent.datatype['int'].replace(/%size%/i, 11)));
+                endQuery.push(alter+' '+equivalent.table.alter.foreignkey.replace(/%colname%/i, name+'_'+defautExtra.idName)
+                                        .replace(/%tablename%/ig, index.toLowerCase())
+                                        .replace(/%fromtablename%/ig, name)
+                                        .replace(/%fromcolname%/ig, defautExtra.idName));
+                models.relations[index] = {
+                    table: index.toLowerCase(),
+                    name : index+'_'+defautExtra.idName,
+                    d : 'out',
+                    n : many
+                };
+                delete name;
+                delete alter;
+            }
+            else if(relation == 'manytomany' || is_object(relation)){
+                var name = schema.name.toLowerCase();
+                var iattrs = {};
+                var relations = {};
+                relations[name] = 'manytoone';
+                relations[index] = 'manytoone';
+
+                var model = {
+                    name : name+'_'+index,
+                    relations : relations
+                };
+
+                if(relation != 'manytomany'){
+                    for(i in relation){
+                        iattrs[i] = relation[i];
+                    }
+                }
+                model.attrs = iattrs;
+                associationTable.push(model);
+
+                delete name;
+            }
+
         }
 
-        for(index in indexes){
-
+        if(indexes) {
+            if (indexes.primary && !defautExtra.id) {
+                if (is_string(indexes.primary)) {
+                    definition.push('PRIMARY KEY (' + indexes.primary + ')');
+                }
+                else if (is_array(indexes.primary)) {
+                    definition.push('PRIMARY KEY (' + indexes.primary.join(',') + ')');
+                }
+                else {
+                    throw new Error('The value of indexes.primary must be string or array')
+                }
+            }
+            if (indexes.unique) {
+                if (is_string(indexes.unique)) {
+                    definition.push('UNIQUE (' + indexes.unique + ')');
+                }
+                else if (is_array(indexes.unique)) {
+                    for (index in indexes.unique) {
+                        if (indexes.unique[index])
+                            definition.push('UNIQUE (' + indexes.unique + ')');
+                        else if (is_array) {
+                            definition.push('UNIQUE (' + indexes.unique.join(',') + ')');
+                        }
+                        else {
+                            throw new Error('The value of indexes.unique[child] must be string or array')
+                        }
+                    }
+                }
+                else {
+                    throw new Error('The value of indexes.unique must be string or array')
+                }
+            }
+            if (indexes.index) {
+                if (is_string(indexes.index)) {
+                    definition.push('UNIQUE (' + indexes.index + ')');
+                }
+                else if (is_array(indexes.index)) {
+                    definition.push('UNIQUE (' + indexes.index.join(',') + ')');
+                }
+            }
         }
 
-        query = query.replace(/%definition%/i, definition.join(','));
+        query = query.replace(/%definition%/ig, definition.join(','));
         query = {
             query : query,
-            endQuery : endQuery
+            foreignKey : foreignKey,
+            endQuery : endQuery.join(';'),
+            associationTable : associationTable
         }
     }
 

@@ -24,7 +24,7 @@ module.exports = function(config){
                 makeAfterConnect.push(q);
                 return null;
             }
-            if(/^(INSERT|UPDATE|CREATE)/i.test(q.query)){
+            if(/^(INSERT|UPDATE|CREATE|DROP)/i.test(q.query)){
                 var done = pgclient.query(q.query, q.data);
                 if(done){
                     if(q.success && is_function(q.success))q.success(done)
@@ -43,6 +43,7 @@ module.exports = function(config){
 
                 });
             }
+            return this;
         };
         fn.close = function(){
             pgdone();

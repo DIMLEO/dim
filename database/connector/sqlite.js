@@ -24,7 +24,7 @@ module.exports = function(config){
             if(/^CREATE/i.test(q.query)){
                 db.run(q.query);
             }
-            else if(/^(INSERT|UPDATE)/i.test(q.query)){
+            else if(/^(INSERT|UPDATE|DROP)/i.test(q.query)){
                 var stmt = db.prepare(q.query);
                 stmt.run(q.data);
             }
@@ -46,7 +46,7 @@ module.exports = function(config){
                 });
 
             }
-
+            return this;
         };
     connector.close = function(){
             db.close();

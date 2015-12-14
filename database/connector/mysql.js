@@ -56,7 +56,7 @@ module.exports = function(config){
         };
         connector.sql = function(q){
             if(!q.query) return null;
-            if(/^(INSERT|UPDATE|CREATE)/i.test(q.query)){
+            if(/^(INSERT|UPDATE|CREATE|DROP)/i.test(q.query)){
                 var done = connection.query(q.query, q.data);
                 if(done){
                     if(q.success && is_function(q.success))q.success(done)
@@ -76,6 +76,7 @@ module.exports = function(config){
                     else if (q.success && is_function(q.success) && rows && fields) q.success(rows, fields);
                 });
             }
+            return this;
         };
         connector.close = function(){
             connection.end();

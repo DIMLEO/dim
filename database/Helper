@@ -39,3 +39,76 @@ the precedent query can be write like that
 #int:10@false$6
 //==> output {type: 'int', size: 10, null : false, default : 6}
 ========================================================================================================================
+
+========================================================================================================================
+Model Schema declaration
+
+module.exports = {
+    name : 'table_name', /** [a-z_0-9]+ not start with a number  **/
+    extra : {
+        /*
+         * id : true
+         * idName: 'id'
+         * create_at : true
+         * soft_delete : true
+         * update_at : true
+         *
+        */
+    },
+    attrs : {
+        /*
+         * all columns names and définition
+         */
+    },
+    /*
+     *
+     */
+    indexes: {
+        /*
+         * primary : '', //will be ignored if extra.id = true
+         * unique  : '',
+         * index: ''
+         *
+         * syntax possible with primary
+         * primary : 'colname',
+         * primary : ['col1', 'col2',...]
+         *
+         * syntax possible with unique
+         * unique : 'colname'
+         * unique : ['col1', 'col2', ...]
+         * unique : [['col1', 'col2', ...], 'col3']
+         * unique : [['col1', 'col2', ...]]
+         *
+         * syntax possible with index
+         * index : 'colname'
+         * index : ['col1', 'col2']
+         *
+         */
+    },
+    relations : {
+        /*
+         * table_name : string|object
+         *
+         * relation values if is string:
+         *
+         * ManyToOne
+         * OneToOne
+         * OneToMany
+         * ManyToMany
+         *
+         * Exemple with string
+         * table_name: 'OneToMany|ManyToOne|OneToOne'
+         *
+         * Exemple with object
+         * table_name: {column list to add to the associative table}
+         * if the object is empty or that the value is equal to 'ManyToMany', only the primary key of both tables will be used
+         *
+         */
+    },
+    exists : {
+        recreate : true|false,
+        smart_update : true|false /** is exists.recreate is true this value is ignored **/
+    }
+};
+========================================================================================================================
+
