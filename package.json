@@ -1,11 +1,26 @@
 {
   "name": "dim",
   "version": "1.0.0",
-  "description": "Laravel structure For Express.js",
+  "description": "module and package required to start express-life",
   "main": "index.js",
   "scripts": {
-    "test": "Console.log('DIM Package')"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Diarra Mamadou",
-  "license": "MIT"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DIMLEO/dim.git"
+  },
+  "keywords": [
+    "Express",
+    "Life",
+    "NodeJs",
+    "Web",
+    "Application"
+  ],
+  "author": "DIARRA Mamadou",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/DIMLEO/dim/issues"
+  },
+  "homepage": "https://github.com/DIMLEO/dim#readme"
 }
