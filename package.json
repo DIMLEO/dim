@@ -1,5 +1,5 @@
 {
-  "name": "dim",
+  "name": "elife-dim",
   "version": "1.0.1",
   "description": "Laravel structure For Express.js",
   "main": "index.js",

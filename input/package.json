@@ -1,0 +1,18 @@
+{
+  "name": "input",
+  "version": "1.0.0",
+  "description": "You may access all user input with a few simple methods. You do not need to worry about the HTTP verb used for the request, as input is accessed in the same way for all verbs.",
+  "main": "Input.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Form",
+    "GET",
+    "POST",
+    "FILES",
+    "Manager"
+  ],
+  "author": "Diarra mamadou",
+  "license": "MIT"
+}
