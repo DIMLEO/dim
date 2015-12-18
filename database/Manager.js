@@ -1,8 +1,19 @@
 
+$ModelBuilder = require('./builder/model');
+$AbstractModel = require('./Model');
+$Grammar = undefined;
+
 module.exports = function(params, models){
+
+    var allModels = {};
+
     var config = params.connections[params.default];
+
     var driver = params.default;
+
     var endModels = {}, endQuery = [], associationTable = {};
+
+    var current_index_in_model = 0;
 
     var modelHandler = function(index, model){
         var query = '';
@@ -26,13 +37,50 @@ module.exports = function(params, models){
             dbsm.sql({
                 query: query.query,
                 success: function (r) {
-                    console.log(' done');
-                    consoleMarker('end of table ' + index);
-                    modelCreator(++current_index_in_model);
+                    if(!model.data){
+                        endTable(index);
+                    }
+                    else{
+                        //TODO DELOCALISE CE CODE
+                            var nbLine = 0, ln = model.data.length;
+                            console.log(' Inserting data into the '+index+' table');
+                            process.stdout.write('0 %');
+                            for(i in model.data){
+                                var d = model.data[i], values = [], key = [], accesseur=[];
+                                for(j in d){
+                                    key.push(j);
+                                    accesseur.push('?');
+                                    values.push(d[j]);
+                                }
+                                dbsm.sql({
+                                    query: 'INSERT INTO '+index+'('+ key.join(',')+') VALUES('+accesseur.join(',')+')',
+                                    data: values,
+                                    success : function(r){
+                                        nbLine++;
+
+                                        //START
+
+                                        process.stdout.clearLine();
+                                        process.stdout.cursorTo(0);
+                                        process.stdout.write(' '+((nbLine/ln)*100).toFixed(2)+' %');
+
+                                        //END
+                                        if(i == model.data.length-1){
+                                            process.stdout.write(' '+nbLine+' lines have been successfully registered');
+                                            endTable(index);
+                                        }
+                                    },
+                                    error : function(){
+                                        console.log(' the recording fail failure ',d);
+                                    }
+                                })
+                            }
+                        //TODO DELOCALISE THIS CODE
+                    }
                 },
                 error: function (r, err) {
                     console.log(endModels, query.foreignKey);
-                    console.log(' crashed');
+                    console.log('\x1b[31m crashed\x1b[37m');
                     console.log(err);
                     consoleMarker('end of table ' + index);
                 }
@@ -44,7 +92,11 @@ module.exports = function(params, models){
             modelCreator(++current_index_in_model);
         }
     };
-
+    var endTable = function(index){
+        console.log('\x1b[32m done\x1b[37m');
+        consoleMarker('end of table ' + index);
+        modelCreator(++current_index_in_model);
+    };
     var endModelsMaker = function(){
         current_index_in_model = 0;
 
@@ -81,14 +133,21 @@ module.exports = function(params, models){
 
         modelCreator(current_index_in_model);
     };
-
     var alterTable = function(){
-        dbsm.sql({
-            query: endQuery.join(';')
-        })
+        if(endQuery.length > 0) {
+            for (var i in endQuery)
+                dbsm.sql({
+                    query: endQuery[i],
+                    success : function(){
+                        if(endQuery.length == i){
+                            readyCaller();
+                        }
+                    }
+                });
+        }else{
+            readyCaller();
+        }
     }
-
-    var current_index_in_model = 0;
     var modelCreator = function(index){
         if(index >= models_keys.length){
             if(endModels == undefined)
@@ -113,7 +172,7 @@ module.exports = function(params, models){
                         dbsm.table_drop(index,function(r, err){
                             if(r){
                                 console.log(' deleting '+index+' table was made');
-                                //modelHandler(index, model);
+                                modelHandler(index, model);
                             }else{
                                 console.log('crashed');
                                 consoleMarker(' end of table '+index);
@@ -127,6 +186,60 @@ module.exports = function(params, models){
                 }
                 if(smartanalyse){
 
+                    //GET TABLE STRUCTURE
+                    dbsm.describe(index,function(r, field){
+
+                        if(!sbuilder) sbuilder = require('./builder/schema');
+
+                        var column = undefined;
+
+                        var attrs = sbuilder(model, equivalent);
+                        var columns = Object.keys(attrs);
+                        var theAlterQuerys = [], alter = equivalent.table.alter, altertable = undefined;
+
+                        for(column in attrs){
+                            if(!r[column]){
+                                if(!altertable) altertable = alter.query.replace(/%tablename%/i, index);
+
+                                console.log(' \x1b[33mthe '+column+' column should be added to the '+index+' table \x1b[37m');
+                                theAlterQuerys.push(altertable+
+                                    ' '+(alter.columns.add.replace(/%colname%/i, column)
+                                    .replace(/%definition%/i, fn.getDefinition(attrs[column], equivalent))));
+                            }
+                            else{
+                                if(!altertable) altertable = alter.query.replace(/%tablename%/i, index);
+
+                                if(fn.getRealType(attrs[column], equivalent).toLowerCase() != r[column].type.toLowerCase()){
+                                    console.log(' \x1b[31mthe type of the '+column+' column must be modified to '+fn.getRealType(attrs[column], equivalent)+' \x1b[37m');
+                                    theAlterQuerys.push(altertable+
+                                    ' '+(alter.columns.rename.replace(/%colname%|%new_colname%/ig, column)
+                                        .replace(/%definition%/i, fn.getDefinition(attrs[column], equivalent))));
+                                }
+                            }
+                        }
+                        for(column in r){
+                            if(!attrs[column]){
+                                if(!altertable) altertable = alter.query.replace(/%tablename%/i, index);
+
+                                console.log(' \x1b[31mthe '+column+' column must be removed from the '+index+' table \x1b[37m');
+                                theAlterQuerys.push(altertable+' '+alter.columns.drop.replace(/%colname%/i, column));
+                            }
+                        }
+                        if(theAlterQuerys.length == 0){
+                            console.log(' no changes are required to the table');
+                            endTable(index);
+                        }else{
+                            for(var i in theAlterQuerys)
+                                dbsm.sql({
+                                    query : theAlterQuerys[i],
+                                    success: function(r){
+                                        if(i == theAlterQuerys.length-1)
+                                            endTable(index);
+                                    }
+                                });
+                        }
+
+                    });
                 }
                 delete smartanalyse;
             }
@@ -137,20 +250,44 @@ module.exports = function(params, models){
         });
     };
     var consoleMarker = function(str){
-        console.log('============================================================================>>'+str+'');
+        console.log('\x1b[36m', "============================================================================>>"+str, '\x1b[37m');
+    };
+    var readyCaller = function(){
+        if(dbsm.$readCallBack.length > 0) {
+            for(var i in dbsm.$readCallBack){
+                dbsm.$readCallBack[i]();
+            }
+        }
+        dbsm.$readCallBack = [];
     };
 
     //console.log(config, driver);
 
     /*
-     * load ther driver
+     * load the driver
      * automatically creating the database if the database does not exist
      */
     var dbsm = require('./connector/'+driver)(config);
+
     /*
-     * load ther query builder
+     * load the SQL BUILD QUERY driver
+     */
+
+    /*
+     * load the SQL query builder
      */
     var builder = require('./builder/builder');
+
+    /*
+     * load the Schema JSON builder if required
+     * by default is false
+     */
+    var sbuilder = undefined;
+    /*
+     * load the Schema JSON builder if required
+     * by default is false
+     */
+    var fn = require('./builder/function');
 
     /*
      * load the equivalent query json
@@ -169,16 +306,21 @@ module.exports = function(params, models){
     var datatype = require('./datatype');
 
     /*
-     *automatic processing models
+     * automatic processing models
      * Automatic Creation of the required tables
      * considered relations
      * set automatic update of the table structure
      * Column suppression, adding column
      */
 
-     var models_keys = Object.keys(models);
-     if(models_keys.length > 0)
-        modelCreator(current_index_in_model);
+    var models_keys = Object.keys(models);
+    if(models_keys.length > 0) modelCreator(current_index_in_model);
+
+    dbsm.$readCallBack = [];
+
+    dbsm.ready = function(callback){
+        dbsm.$readCallBack.push(callback);
+    };
 
     return dbsm;
 };

@@ -18,13 +18,16 @@ module.exports = function(config){
     connector.isOpen = function(){
             return db != null;
         };
+    connector.sqlQuery= function(query){
+        return false;
+    };
     connector.sql = function(q){
             if(!q.query) return null;
 
             if(/^CREATE/i.test(q.query)){
                 db.run(q.query);
             }
-            else if(/^(INSERT|UPDATE|DROP)/i.test(q.query)){
+            else if(/^(INSERT|UPDATE|DROP|ALTER)/i.test(q.query)){
                 var stmt = db.prepare(q.query);
                 stmt.run(q.data);
             }
@@ -42,7 +45,13 @@ module.exports = function(config){
                         else
                             q.error(err);
                     }
-                    else if(q.success && is_function(q.success) && rows) q.success(rows, null);
+                    else if(q.success && is_function(q.success) && rows){
+                        var field = [];
+                        if(rows[0]){
+                            field = Object.keys(rows[0]);
+                        }
+                        q.success(rows, field);
+                    }
                 });
 
             }

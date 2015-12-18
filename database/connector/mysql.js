@@ -10,6 +10,9 @@ module.exports = function(config){
      */
     var mysql      = require('mysql');
 
+    var mysqlBuilderFunction      = require('./../queryBuilder/mysqlQueryBuilder');
+    var mysqlBuilder              = new mysqlBuilderFunction;
+
     /*
      * CREATE NEW CONNEXION WITH PARAMS
      */
@@ -51,12 +54,23 @@ module.exports = function(config){
 
     var connector = require('./connector');
     {
+        connector.sqlQuery= function(query){
+            return mysqlBuilder.run(query);
+        };
         connector.isOpen= function(){
             return connection != null;
         };
         connector.sql = function(q){
+            if(!is_string(q.query)){
+                var d = mysqlBuilder.run(q.query);
+                //console.log(d);
+                q.query = d.query;
+                q.data = d.data;
+            }
+
             if(!q.query) return null;
-            if(/^(INSERT|UPDATE|CREATE|DROP)/i.test(q.query)){
+
+            if(/^(INSERT|UPDATE|CREATE|DROP|ALTER)/i.test(q.query)){
                 var done = connection.query(q.query, q.data);
                 if(done){
                     if(q.success && is_function(q.success))q.success(done)

@@ -1,32 +1,11 @@
-var getDefinition = function(attr, equivalent){
-    var temp;
-
-    type = attr.type.toLowerCase();
-    temp = equivalent.datatype[type];
-
-    if(type == 'enum'){
-        if(!attr.values) equivalent.defaultSize[type];
-        temp = temp.replace(/%values%/ig, (is_string(attr.values))?attr.values:'"'+attr.join('","')+'"');
-    }
-
-    temp = temp.replace(/%size%/ig,(attr.size)?attr.size:equivalent.defaultSize[type]);
-
-    return temp += (attr.null)? ' NULL ' : ' NOT NULL ';
-};
-
 module.exports = function(schema, equivalent, models){
 
     if(!models.relations)
         models.relations = {};
     var query = '';
 
-    var defautExtra = {
-        id : true,
-        idName: 'id',
-        create_at : true,
-        soft_delete : true,
-        update_at : true
-    };
+    var fn = require('./function');
+    var defautExtra = require('./defaultExtra');
 
     /*
      * when the type keys exists and value is query
@@ -95,7 +74,7 @@ module.exports = function(schema, equivalent, models){
                 throw new Error('a keyword '+index+' is used by the data base management system');
                 return;
             }
-            definition.push(index+' '+getDefinition(attrs[index], equivalent));
+            definition.push(index+' '+fn.getDefinition(attrs[index], equivalent));
         }
         //console.log(definition)
 
@@ -108,7 +87,7 @@ module.exports = function(schema, equivalent, models){
             relation = relations[index].toLowerCase();
             if(relation == 'manytoone' || relation == 'onetoone'){
                 foreignKey.push(index);
-                definition.push(index+'_id '+equivalent.datatype['int'].replace(/%size%/i, 11));
+                definition.push(index+'_'+defautExtra.idName+' '+equivalent.datatype['int'].replace(/%size%/i, 11));
                 definition.push( equivalent.table.foreignkey.replace(/%colname%/ig, index+'_'+defautExtra.idName)
                     .replace(/%tablename%/ig, schema.name.toLowerCase())
                     .replace(/%fromtablename%/ig, index.toLowerCase())
@@ -151,7 +130,7 @@ module.exports = function(schema, equivalent, models){
                 };
 
                 if(relation != 'manytomany'){
-                    for(i in relation){
+                    for(var i in relation){
                         iattrs[i] = relation[i];
                     }
                 }

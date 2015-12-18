@@ -1,0 +1,93 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'C:\\Program Files\\nodejs\\node.exe',
+1 verbose cli   'C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js',
+1 verbose cli   'publish' ]
+2 info using npm@3.3.6
+3 info using node@v5.0.0
+4 verbose publish [ '.' ]
+5 silly cache add args [ '.', null ]
+6 verbose cache add spec .
+7 silly cache add parsed spec Result {
+7 silly cache add   raw: '.',
+7 silly cache add   scope: null,
+7 silly cache add   name: null,
+7 silly cache add   rawSpec: '.',
+7 silly cache add   spec: 'F:\\Ionic\\MeloServer\\node_modules\\dim',
+7 silly cache add   type: 'directory' }
+8 verbose addLocalDirectory C:\Users\DIARRA\AppData\Roaming\npm-cache\dim\1.0.0\package.tgz not in flight; packing
+9 info lifecycle dim@1.0.0~prepublish: dim@1.0.0
+10 silly lifecycle dim@1.0.0~prepublish: no script for prepublish, continuing
+11 verbose tar pack [ 'C:\\Users\\DIARRA\\AppData\\Roaming\\npm-cache\\dim\\1.0.0\\package.tgz',
+11 verbose tar pack   'F:\\Ionic\\MeloServer\\node_modules\\dim' ]
+12 verbose tarball C:\Users\DIARRA\AppData\Roaming\npm-cache\dim\1.0.0\package.tgz
+13 verbose folder F:\Ionic\MeloServer\node_modules\dim
+14 verbose addLocalTarball adding from inside cache C:\Users\DIARRA\AppData\Roaming\npm-cache\dim\1.0.0\package.tgz
+15 silly cache afterAdd dim@1.0.0
+16 verbose afterAdd C:\Users\DIARRA\AppData\Roaming\npm-cache\dim\1.0.0\package\package.json not in flight; writing
+17 verbose afterAdd C:\Users\DIARRA\AppData\Roaming\npm-cache\dim\1.0.0\package\package.json written
+18 silly publish { name: 'dim',
+18 silly publish   version: '1.0.0',
+18 silly publish   description: 'Laravel structure For Express.js',
+18 silly publish   main: 'index.js',
+18 silly publish   scripts: { test: 'Console.log(\'DIM Package\')' },
+18 silly publish   author: { name: 'Diarra Mamadou' },
+18 silly publish   license: 'MIT',
+18 silly publish   gitHead: 'f699202c6fc4cab719468f90d7b1060d039d4ff4',
+18 silly publish   readme: 'ERROR: No README data found!',
+18 silly publish   _id: 'dim@1.0.0',
+18 silly publish   _shasum: '562295faaf45ee2d55653f5b8866cf71b63ecdc5',
+18 silly publish   _from: '.' }
+19 verbose getPublishConfig undefined
+20 silly mapToRegistry name dim
+21 silly mapToRegistry using default registry
+22 silly mapToRegistry registry https://registry.npmjs.org/
+23 silly mapToRegistry uri https://registry.npmjs.org/dim
+24 verbose publish registryBase https://registry.npmjs.org/
+25 silly publish uploading C:\Users\DIARRA\AppData\Roaming\npm-cache\dim\1.0.0\package.tgz
+26 verbose request uri https://registry.npmjs.org/dim
+27 verbose request sending authorization for write operation
+28 info attempt registry request try #1 at 12:26:22
+29 verbose request using bearer token for auth
+30 verbose request id ca5200f46957c3be
+31 http request PUT https://registry.npmjs.org/dim
+32 info retry will retry, error on last attempt: Error: getaddrinfo ENOTFOUND registry.npmjs.org registry.npmjs.org:443
+33 info attempt registry request try #2 at 12:26:43
+34 verbose request using bearer token for auth
+35 http request PUT https://registry.npmjs.org/dim
+36 http 403 https://registry.npmjs.org/dim
+37 verbose headers { 'content-type': 'application/json',
+37 verbose headers   'cache-control': 'max-age=300',
+37 verbose headers   'content-length': '95',
+37 verbose headers   'accept-ranges': 'bytes',
+37 verbose headers   date: 'Mon, 14 Dec 2015 12:27:11 GMT',
+37 verbose headers   via: '1.1 varnish',
+37 verbose headers   connection: 'keep-alive',
+37 verbose headers   'x-served-by': 'cache-fra1246-FRA',
+37 verbose headers   'x-cache': 'MISS',
+37 verbose headers   'x-cache-hits': '0',
+37 verbose headers   'x-timer': 'S1450096030.853068,VS0,VE742' }
+38 verbose request invalidating C:\Users\DIARRA\AppData\Roaming\npm-cache\registry.npmjs.org\dim on PUT
+39 error publish Failed PUT 403
+40 verbose stack Error: You do not have permission to publish 'dim'. Are you logged in as the correct user? : dim
+40 verbose stack     at makeError (C:\Program Files\nodejs\node_modules\npm\node_modules\npm-registry-client\lib\request.js:264:12)
+40 verbose stack     at CachingRegistryClient.<anonymous> (C:\Program Files\nodejs\node_modules\npm\node_modules\npm-registry-client\lib\request.js:252:14)
+40 verbose stack     at Request._callback (C:\Program Files\nodejs\node_modules\npm\node_modules\npm-registry-client\lib\request.js:172:14)
+40 verbose stack     at Request.self.callback (C:\Program Files\nodejs\node_modules\npm\node_modules\request\request.js:198:22)
+40 verbose stack     at emitTwo (events.js:87:13)
+40 verbose stack     at Request.emit (events.js:172:7)
+40 verbose stack     at Request.<anonymous> (C:\Program Files\nodejs\node_modules\npm\node_modules\request\request.js:1063:14)
+40 verbose stack     at emitOne (events.js:82:20)
+40 verbose stack     at Request.emit (events.js:169:7)
+40 verbose stack     at IncomingMessage.<anonymous> (C:\Program Files\nodejs\node_modules\npm\node_modules\request\request.js:1009:12)
+41 verbose statusCode 403
+42 verbose pkgid dim
+43 verbose cwd F:\Ionic\MeloServer\node_modules\dim
+44 error Windows_NT 6.3.9600
+45 error argv "C:\\Program Files\\nodejs\\node.exe" "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js" "publish"
+46 error node v5.0.0
+47 error npm  v3.3.6
+48 error code E403
+49 error You do not have permission to publish 'dim'. Are you logged in as the correct user? : dim
+50 error If you need help, you may report this error at:
+50 error     <https://github.com/npm/npm/issues>
+51 verbose exit [ 1, true ]

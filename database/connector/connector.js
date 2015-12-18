@@ -70,5 +70,27 @@ module.exports = {
                 if(callback)callback(false, r);
             }
         })
+    },
+    describe : function(name, callback){
+        var self = this;
+        self.sql({
+            query : self.equivalent.table.describe.replace(/%tablename%/i, name),
+            success: function(r){
+                if(callback){
+                    var rpack = {};
+                    for(var i in r){
+                        var ri = r[i];
+                        rpack[ri[self.equivalent.table.describe_field_name]] = {
+                            type    : ri[self.equivalent.table.describe_field_type],
+                            null    : ri[self.equivalent.table.describe_field_null],
+                            extra   : ri[self.equivalent.table.describe_field_extra],
+                            default : ri[self.equivalent.table.describe_field_default],
+                            key     : ri[self.equivalent.table.describe_field_key]
+                        };
+                    }
+                    callback(rpack);
+                }
+            }
+        })
     }
 };

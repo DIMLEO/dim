@@ -17,6 +17,9 @@ module.exports = function(config){
         fn.isOpen = function(){
             return pgclient != null;
         };
+        fn.sqlQuery= function(query){
+            return false;
+        };
         fn.sql = function(q){
             if(!q.query) return null;
 
@@ -24,7 +27,7 @@ module.exports = function(config){
                 makeAfterConnect.push(q);
                 return null;
             }
-            if(/^(INSERT|UPDATE|CREATE|DROP)/i.test(q.query)){
+            if(/^(INSERT|UPDATE|CREATE|DROP|ALTER)/i.test(q.query)){
                 var done = pgclient.query(q.query, q.data);
                 if(done){
                     if(q.success && is_function(q.success))q.success(done)
