@@ -165,7 +165,7 @@ module.exports = function(env){
         var code = "";
         var params = Object.keys(params);
         for(var i in params){
-            code += "\tvar "+params[i]+" = $data."+params[i]+";\n";
+            code += "\tvar "+params[i]+" = ($data)?$data."+params[i]+":undefined;\n";
         }
         return code;
     }

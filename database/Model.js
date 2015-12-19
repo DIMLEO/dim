@@ -17,6 +17,7 @@ module.exports = Model = function(){
     this.$isModel = true;
     this.$AfterCreateMakeMe = undefined;
     this.$compiledAction = 'read';
+    this.$lastValidation = undefined;
 
     this.$operator = {
         '>'     : '$gt',
@@ -613,4 +614,11 @@ module.exports = Model = function(){
         return this;
     };
 
+
+    this.validate = function(rules, data){
+        if(!data) data = $Input.all();
+        if(is_string(rules) && this.$validation[rules]) rules = this.$validation[rules];
+
+        return this.$lastValidation = $Validation.make(rules, data);
+    };
 };

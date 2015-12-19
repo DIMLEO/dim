@@ -69,6 +69,11 @@ module.exports = function(name){
                 code += name+'.prototype.$extra = $Model["'+name.toLowerCase()+'"].extra;'+endl(2);
             }
 
+            if($Model[name.toLowerCase()].extra){
+                code += '//Add validation prototype will be used to vaidate a form data Or others'+endl();
+                code += name+'.prototype.$validation = $Model["'+name.toLowerCase()+'"].validation;'+endl(2);
+            }
+
             //code += 'console.log($Model["'+name.toLowerCase()+'"].methods);'+endl;
             code += '//Creating an extension, it may be used generally'+endl();
             code += '$'+name+' = new '+name+'();'+endl(2);
