@@ -1,5 +1,5 @@
 {
-  "name": "dim",
+  "name": "elife-dim",
   "version": "1.0.2",
   "description": "module and package required to start express-life",
   "main": "index.js",
