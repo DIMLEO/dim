@@ -1,18 +1,20 @@
 var fs = require('fs');
-var path = require('path');
-fs.mkdirParent = function(dirPath, mode, callback) {
+var pathModule = require('path');
+fs.mkdirParent = function(dirPath, mode) {
     //Call the standard fs.mkdir
-    fs.mkdir(dirPath, mode, function(error) {
+    if(fs.existsSync(dirPath)) return;
+    try{
+        fs.mkdirSync(dirPath, mode);
+    }catch(e){
         //When it fail in this way, do the custom steps
-        if (error && error.errno === 34) {
-            //Create all the parents recursively
-            fs.mkdirParent(path.dirname(dirPath), mode, callback);
-            //And then the directory
-            fs.mkdirParent(dirPath, mode, callback);
-        }
+        // && error.errno === 34
+        //Create all the parents recursively
+        fs.mkdirParent(pathModule.dirname(dirPath), mode);
+        //And then the directory
+        fs.mkdirParent(dirPath, mode);
+
         //Manually run the callback since we used our own callback to do all these
-        callback && callback(error);
-    });
+    }
 };
 
 module.exports = function(env){
@@ -283,7 +285,7 @@ module.exports = function(env){
 
         to = reMaker(to);
 
-        fs.mkdirParent( require('path').dirname(env.path.storage+'/views/'+file+'.js'));
+        fs.mkdirParent(pathModule.dirname(pathModule.normalize(env.path.storage+'/views/'+file+'.js')));
         fs.writeFileSync(env.path.storage+'/views/'+file+'.js', to, "UTF-8");
     }
 
