@@ -1,34 +1,34 @@
 module.exports = {
 
     table : {
-        create                  :'CREATE TABLE IF NOT EXISTS %tablename%(%definition%)ENGINE=INNODB;',
-        list                    :'SHOW TABLES',
-        list_field_name         :'Tables_in_%dbname%',
-        describe                :'DESCRIBE %tablename%',
-        describe_field_name     :'Field',
-        describe_field_type     :'Type',
-        describe_field_null     :'Null',
-        describe_field_key      :'Key',
-        describe_field_default  :'Default',
-        describe_field_extra    :'Extra',
-        exists                  :"SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '%tablename%' AND TABLE_SCHEMA = '%dbname%'",
-        exists_field_name       :'TABLE_NAME',
-        delete                  :'DROP TABLE IF EXISTS  %tablename%',
-        rename                  :'ALTER TABLE %tablename% RENAME %table_newname%',
-        foreignkey              : 'CONSTRAINT fk_%tablename%_%colname% FOREIGN KEY (%colname%) REFERENCES %fromtablename%(%fromcolname%)',
+        create                  :'CREATE TABLE IF NOT EXISTS %tablename%(%definition%);',
+        list                    :'SELECT name FROM sqlite_master WHERE type = "table";',
+        list_field_name         :'name',
+        describe                :'PRAGMA table_info(%tablename%)',
+        describe_field_name     :'name',
+        describe_field_type     :'type',
+        describe_field_null     :'notnull',
+        describe_field_key      :'pk',
+        describe_field_default  :'dflt_value',
+        describe_field_extra    :'',
+        exists                  :"SELECT name FROM sqlite_master WHERE type='table' AND name='%tablename%';",
+        exists_field_name       :'name',
+        delete                  :'DROP TABLE IF EXISTS %tablename%;',
+        rename                  :'ALTER TABLE %tablename% RENAME %table_newname%;',
+        foreignkey              : ' FOREIGN KEY(%colname%) REFERENCES %fromtablename%(%fromcolname%)',
         alter : {
             query   :'ALTER TABLE %tablename% ',
             columns : {
-                rename      :'CHANGE %colname% %new_colname% %definition%',
-                add         :'ADD COLUMN %colname% %definition%',
-                drop        :'DROP COLUMN %colname%',
-                primary     :'ADD PRIMARY KEY (%colname%)',
-                foreignkey  :'ADD CONSTRAINT fk_%tablename%_%colname% FOREIGN KEY (%colname%) REFERENCES %fromtablename%(%fromcolname%)'
+                rename      :' CHANGE %colname% %new_colname% %definition%',
+                add         :' ADD COLUMN %colname% %definition%',
+                drop        :' DROP COLUMN %colname%',
+                primary     :' ADD PRIMARY KEY (%colname%)',
+                foreignkey  :' FOREIGN KEY (%colname%) REFERENCES %fromtablename%(%fromcolname%)'
             }
         },
         columns : {
-            exist: "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '%dbname%' AND TABLE_NAME = '%tablename%' AND COLUMN_NAME = '%name%' ORDER BY ORDINAL_POSITION ",
-            exists_field_name : 'COLUMN_NAME'
+            exist: "",
+            exists_field_name : ''
         }
     },
     operator : {
@@ -53,9 +53,9 @@ module.exports = {
         '>>'        : ">>"
     },
     datatype: {
-        inc         :'INT PRIMARY KEY AUTO_INCREMENT',
-        integer     :'INT',
-        int         :'INT(%size%)',
+        inc         :'INTEGER PRIMARY KEY',
+        integer     :'INTEGER',
+        int         :'INTEGER',
         mint        :'MEDIUMINT',
         sint        :'SMALLINT',
         tint        :'TINYINT',

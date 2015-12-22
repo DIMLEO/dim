@@ -4,6 +4,8 @@ module.exports = function(config){
      */
     if(config.name.length == 0) return null;
 
+    var psqlBuilderFunction      = require('./../queryBuilder/psqlQueryBuilder');
+    var psqlBuilder              = new psqlBuilderFunction;
 
     var call = function(){
         for(var i in makeAfterConnect){
@@ -23,6 +25,12 @@ module.exports = function(config){
         fn.sql = function(q){
             if(!q.query) return null;
 
+            if(!is_string(q.query)){
+                var d = psqlBuilder.run(q.query);
+                //console.log(d);
+                q.query = d.query;
+                q.data = d.data;
+            }
             if(!this.isOpen()){
                 makeAfterConnect.push(q);
                 return null;

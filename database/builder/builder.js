@@ -39,7 +39,7 @@ module.exports = function(schema, equivalent, models){
                 defautExtra[index] = extra[index];
             }
 
-        var definition = [];
+        var definition = [], endDefinition = [];
 
         /*
          * if is true add id auto_increment column
@@ -88,7 +88,7 @@ module.exports = function(schema, equivalent, models){
             if(relation == 'manytoone' || relation == 'onetoone'){
                 foreignKey.push(index);
                 definition.push(index+'_'+defautExtra.idName+' '+equivalent.datatype['int'].replace(/%size%/i, 11));
-                definition.push( equivalent.table.foreignkey.replace(/%colname%/ig, index+'_'+defautExtra.idName)
+                endDefinition.push( equivalent.table.foreignkey.replace(/%colname%/ig, index+'_'+defautExtra.idName)
                     .replace(/%tablename%/ig, schema.name.toLowerCase())
                     .replace(/%fromtablename%/ig, index.toLowerCase())
                     .replace(/%fromcolname%/ig, defautExtra.idName));
@@ -184,7 +184,7 @@ module.exports = function(schema, equivalent, models){
             }
         }
 
-        query = query.replace(/%definition%/ig, definition.join(','));
+        query = query.replace(/%definition%/ig, array_merge(definition, endDefinition).join(','));
         query = {
             query : query,
             foreignKey : foreignKey,

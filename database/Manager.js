@@ -34,6 +34,7 @@ module.exports = function(params, models){
         }
         
         if(endModels == undefined || !query.foreignKey.length > 0){
+            //console.log(query.query)
             dbsm.sql({
                 query: query.query,
                 success: function (r) {
@@ -47,6 +48,8 @@ module.exports = function(params, models){
                             process.stdout.write('0 %');
                             for(i in model.data){
                                 var d = model.data[i], values = [], key = [], accesseur=[];
+                                if(!model.extra || model.extra.create_at == undefined || model.extra.create_at) d.create_at =  new Date();
+                                if(!model.extra || model.extra.update_at == undefined || model.extra.update_at) d.update_at =  new Date();
                                 for(j in d){
                                     key.push(j);
                                     accesseur.push('?');
@@ -65,13 +68,13 @@ module.exports = function(params, models){
                                         process.stdout.write(' '+((nbLine/ln)*100).toFixed(2)+' %');
 
                                         //END
-                                        if(i == model.data.length-1){
+                                        if(((nbLine/ln)*100) == 100){
                                             process.stdout.write(' '+nbLine+' lines have been successfully registered');
                                             endTable(index);
                                         }
                                     },
-                                    error : function(){
-                                        console.log(' the recording fail failure ',d);
+                                    error : function(err){
+                                        console.log(' the recording fail failure ', err);
                                     }
                                 })
                             }
@@ -160,7 +163,6 @@ module.exports = function(params, models){
         var model = models[index];
 
         consoleMarker('begin table '+index);
-        console.log(' Search the '+index+' table');
         dbsm.table_exists(index, function(r){
             if(r){
                 console.log(' the '+index+' table already exists');

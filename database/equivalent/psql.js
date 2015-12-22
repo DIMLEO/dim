@@ -1,25 +1,28 @@
+
+throw new error('PSQL is not ready');
+
 module.exports = {
 
     table : {
-        create                  :'CREATE TABLE IF NOT EXISTS %tablename%(%definition%)ENGINE=INNODB;',
-        list                    :'SHOW TABLES',
-        list_field_name         :'Tables_in_%dbname%',
-        describe                :'DESCRIBE %tablename%',
-        describe_field_name     :'Field',
-        describe_field_type     :'Type',
-        describe_field_null     :'Null',
-        describe_field_key      :'Key',
-        describe_field_default  :'Default',
-        describe_field_extra    :'Extra',
-        exists                  :"SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '%tablename%' AND TABLE_SCHEMA = '%dbname%'",
-        exists_field_name       :'TABLE_NAME',
+        create                  :'CREATE TABLE IF NOT EXISTS %tablename%(%definition%);',
+        list                    :'SELECT table_name FROM information_schema.tables  WHERE table_type = \'BASE TABLE\'  AND table_schema = \'public\' ;',
+        list_field_name         :'table_name',
+        describe                :'SELECT column_name, column_default, data_type, is_nullable, character_maximum_length  FROM information_schema.COLUMNS WHERE TABLE_NAME = \'%tablename%\'',
+        describe_field_name     :'column_name',
+        describe_field_type     :'data_type',
+        describe_field_null     :'is_nullable',
+        describe_field_key      :'',
+        describe_field_default  :'column_default',
+        describe_field_extra    :'',
+        exists                  :"SELECT table_name FROM information_schema.tables  WHERE table_type = 'BASE TABLE'  AND table_schema = 'public' AND table_name = '%tablename%';",
+        exists_field_name       :'table_name',
         delete                  :'DROP TABLE IF EXISTS  %tablename%',
         rename                  :'ALTER TABLE %tablename% RENAME %table_newname%',
         foreignkey              : 'CONSTRAINT fk_%tablename%_%colname% FOREIGN KEY (%colname%) REFERENCES %fromtablename%(%fromcolname%)',
         alter : {
             query   :'ALTER TABLE %tablename% ',
             columns : {
-                rename      :'CHANGE %colname% %new_colname% %definition%',
+                rename      :' MODIFY COLUMN %colname% %definition%',
                 add         :'ADD COLUMN %colname% %definition%',
                 drop        :'DROP COLUMN %colname%',
                 primary     :'ADD PRIMARY KEY (%colname%)',
@@ -53,7 +56,7 @@ module.exports = {
         '>>'        : ">>"
     },
     datatype: {
-        inc         :'INT PRIMARY KEY AUTO_INCREMENT',
+        inc         :'SERIAL PRIMARY KEY',
         integer     :'INT',
         int         :'INT(%size%)',
         mint        :'MEDIUMINT',

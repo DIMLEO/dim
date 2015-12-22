@@ -8,6 +8,10 @@ module.exports = function(config){
      * REQUIRED SQLITE3 MODULE FOR THE CONNECTION WITH SQLITE
      */
     var sqlite3 = require('sqlite3').verbose();
+
+    var sqliteBuilderFunction      = require('./../queryBuilder/sqliteQueryBuilder');
+    var sqliteBuilder              = new sqliteBuilderFunction;
+
     var db = new sqlite3.Database((config.memory)?':memory:':config.folder+'/'+config.name);
     db.serialize(function(){
         console.log('Database is open');
@@ -23,13 +27,22 @@ module.exports = function(config){
     };
     connector.sql = function(q){
             if(!q.query) return null;
-
-            if(/^CREATE/i.test(q.query)){
-                db.run(q.query);
+            if(!is_string(q.query)){
+                var d = sqliteBuilder.run(q.query);
+                //console.log(d);
+                q.query = d.query;
+                q.data = d.data;
             }
-            else if(/^(INSERT|UPDATE|DROP|ALTER)/i.test(q.query)){
+
+            if(/^(CREATE|INSERT|UPDATE|DROP|ALTER)/i.test(q.query)){
                 var stmt = db.prepare(q.query);
-                stmt.run(q.data);
+                stmt.run(q.data, function(err){
+                    if(err){
+                        if(q.error && is_function(q.error)) q.error(err);
+                    }else{
+                        if(q.success && is_function(q.success)) q.success();
+                    }
+                });
             }
             else {
                 var rows = [], errors = [];
