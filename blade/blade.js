@@ -19,6 +19,8 @@ fs.mkdirParent = function(dirPath, mode) {
 
 module.exports = function(env){
 
+    var blade_cache = {};
+
     var blade_extends = {
 
     };
@@ -275,7 +277,7 @@ module.exports = function(env){
          to +=  required.join('')+"\n\n";
          to +=  explode(params)+"\n";
 
-         to +=  "\t$html += `"+$html.join("\n\t\t\t\t")+"`;\n\n";
+         to +=  "\t$html += `"+$html.join("\\n\n\t\t\t\t")+"`;\n\n";
 
          to +=  ($extends != '""')?"\t$output = $html+$extends;\n" : "\t$output = $html;\n";
 
@@ -290,6 +292,9 @@ module.exports = function(env){
     }
 
     function make(file, params){
+        if(env.mode == "prod" && blade_cache[file]){
+            return blade_cache[file](params, env);
+        }
         var reg = new RegExp('(.+)\.blade$', 'i');
         var contenu = '', path = env.path.views+'/'+file;
 
@@ -299,7 +304,11 @@ module.exports = function(env){
                     mkBlade(path, file, params);
                 }
                 path = env.path.storage+'/views/'+file;
-                contenu = require(path)(params, env);
+                var view = require(path);
+                if(env.mode == "prod"){
+                    blade_cache[file] = view;
+                }
+                contenu = view(params, env);
             }else{
                 contenu = fs.readFileSync(path, "UTF-8");
             }
