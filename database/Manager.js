@@ -32,8 +32,8 @@ module.exports = function(params, models){
         if(query.associationTable.name){
             associationTable[query.associationTable.name] = query.associationTable;
         }
-        
-        if(endModels == undefined || !query.foreignKey.length > 0){
+
+        if(endModels == undefined || (query.foreignKey.length == 0)){
             //console.log(query.query)
             dbsm.sql({
                 query: query.query,
@@ -89,7 +89,7 @@ module.exports = function(params, models){
                 }
             });
         }else{
-            endModels[index] = query.foreignkey;
+            endModels[index] = query.foreignKey;
             console.log(' presence of foreign key, creating the table refer to the end');
             consoleMarker(' crashed of table ' + index);
             modelCreator(++current_index_in_model);
