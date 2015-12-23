@@ -11,6 +11,7 @@ module.exports = function(){
             }
         },
         attempt : function(data){
+            var clause = {}, authBy = $Environement.auth.authBy;
             if(!$Session.isStart()){
                 throw new Error('Session is not start');
             }
@@ -21,7 +22,7 @@ module.exports = function(){
             if(data.loginUsingId) {
                 clause['id'] = data.loginUsingId;
             }
-            else if(data.user){
+            else if(data.user && is_object(data.user)){
                 if (authBy == 'email' || authBy == 'login-email')
                     clause[$Environement.auth.email_colname] = data.user[$Environement.auth.email_colname];
                 else
@@ -31,16 +32,9 @@ module.exports = function(){
             }
             else{
                 user = data.user, password = data.password;
-                var vUser = undefined;
-                if ($Environement.auth.model == 'User')
-                    vUser = new User();
-                else
-                    vUser = eval('return new ' + $Environement.auth.model + '();');
-
-                var clause = {}, authBy = $Environement.auth.authBy;
 
                 var reg = new RegExp('^[a-zA-Z\\.0-9_-]+@[a-zA-Z0-9_-]{2,}\\.[a-z]{2,4}$', 'ig');
-                if (reg.test(user) && (authBy == 'email' || authBy == 'login-email')) {
+                if(reg.test(user) && (authBy == 'email' || authBy == 'login-email')) {
                     clause[$Environement.auth.email_colname] = user;
                 }
                 else if (authBy == 'login' || authBy == 'login-email') {
@@ -48,11 +42,16 @@ module.exports = function(){
                 }
 
                 if (empty(clause))
-                    throw new Error('User is required fot the authentification')
+                    throw new Error('User is required for the authentification')
 
                 clause[$Environement.auth.password_colname] = password;
                 //clause[$Environement.auth.password_colname] = $Hash.make(password);
             }
+            var vUser = undefined;
+            if ($Environement.auth.model == 'User')
+                vUser = new User();
+            else
+                vUser = eval('new ' + $Environement.auth.model + '();');
             vUser.where(clause).get(function(){
                             if(this.rowCount() > 0){
                                 allVUser[$Session.id()] = vUser;

@@ -277,7 +277,7 @@ module.exports = function(env){
          to +=  required.join('')+"\n\n";
          to +=  explode(params)+"\n";
 
-         to +=  "\t$html += `"+$html.join("\\n\n\t\t\t\t")+"`;\n\n";
+         to +=  "\t$html += `"+$html.join("\n\t\t\t\t")+"`;\n\n";
 
          to +=  ($extends != '""')?"\t$output = $html+$extends;\n" : "\t$output = $html;\n";
 
