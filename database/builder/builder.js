@@ -83,8 +83,7 @@ module.exports = function(schema, equivalent, models){
          */
         var relation = undefined;
         for(index in relations){
-
-            relation = relations[index].toLowerCase();
+            relation = (relations[index])?relations[index].toLowerCase():'';
             if(relation == 'manytoone' || relation == 'onetoone'){
                 foreignKey.push(index);
                 definition.push(index+'_'+defautExtra.idName+' '+equivalent.datatype['int'].replace(/%size%/i, 11));

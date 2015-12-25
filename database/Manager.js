@@ -29,8 +29,13 @@ module.exports = function(params, models){
         console.log(' creation .......');
         
         if(query.endQuery) endQuery.push(query.endQuery);
-        if(query.associationTable.name){
-            associationTable[query.associationTable.name] = query.associationTable;
+        if(query.associationTable){
+            for(var q in query.associationTable){
+
+                models[query.associationTable[q].name] = query.associationTable[q];
+                endModels[query.associationTable[q].name] = Object.keys(query.associationTable[q].relations);
+
+            }
         }
 
         if(endModels == undefined || (query.foreignKey.length == 0)){
@@ -100,9 +105,7 @@ module.exports = function(params, models){
         consoleMarker('end of table ' + index);
         modelCreator(++current_index_in_model);
     };
-    var endModelsMaker = function(){
-        current_index_in_model = 0;
-
+    var getModelsByOrder = function(){
         var endModelsKeyAfterOrder = [], n = undefined, j = undefined;
         var isPresent = false;
         for(n in endModels){
@@ -122,17 +125,23 @@ module.exports = function(params, models){
             }
         }
 
-        for(n in endModels){
-            if(endModels[n] != undefined)
-                endModelsKeyAfterOrder.push(n);
-        }
-
-        models_keys = endModelsKeyAfterOrder;
-        endModels = undefined;
+        for(n in endModelsKeyAfterOrder)
+            delete endModels[endModelsKeyAfterOrder[n]];
 
         delete n;
         delete j;
-        delete endModelsKeyAfterOrder;
+
+        if(!empty(endModels))
+            endModelsKeyAfterOrder = array_merge(endModelsKeyAfterOrder, getModelsByOrder());
+
+
+        return endModelsKeyAfterOrder;
+    }
+    var endModelsMaker = function(){
+        current_index_in_model = 0;
+
+        models_keys = getModelsByOrder();
+        endModels = undefined;
 
         modelCreator(current_index_in_model);
     };
@@ -251,6 +260,7 @@ module.exports = function(params, models){
             }
         });
     };
+
     var consoleMarker = function(str){
         console.log('\x1b[36m', "============================================================================>>"+str, '\x1b[37m');
     };

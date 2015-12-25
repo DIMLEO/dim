@@ -15,9 +15,7 @@ module.exports = function(){
             if(!$Session.isStart()){
                 throw new Error('Session is not start');
             }
-            var user, password,
-                    callback_success = data.success,
-                    callback_error = data.error;
+            var user, password,  callback_success = data.success,  callback_error = data.error;
 
             if(data.loginUsingId) {
                 clause['id'] = data.loginUsingId;
@@ -44,9 +42,10 @@ module.exports = function(){
                 if (empty(clause))
                     throw new Error('User is required for the authentification')
 
-                clause[$Environement.auth.password_colname] = password;
+                //clause[$Environement.auth.password_colname] = password;
                 //clause[$Environement.auth.password_colname] = $Hash.make(password);
             }
+
             var vUser = undefined;
             if ($Environement.auth.model == 'User')
                 vUser = new User();
@@ -54,6 +53,13 @@ module.exports = function(){
                 vUser = eval('new ' + $Environement.auth.model + '();');
             vUser.where(clause).get(function(){
                             if(this.rowCount() > 0){
+                                if(!data.loginUsingId && !is_object(data.user)){
+                                    if(!$Hash.verify(password, vUser.password)){
+                                        callback_error();
+                                        return;
+                                    }
+                                }
+
                                 allVUser[$Session.id()] = vUser;
                                 callback_success();
                             }
