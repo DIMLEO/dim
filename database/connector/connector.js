@@ -55,7 +55,7 @@ module.exports = {
     },
     table_exists : function (name, callback) {
         this.tables(function (r) {
-            console.log(r);
+            //console.log(r);
             if (is_function(callback)) callback(r.indexOf(name.toLowerCase()) != -1);
         });
         return this;
