@@ -1,0 +1,166 @@
+h1, h2, h3, h4, h5, h6{
+    padding: 0px;
+    margin : 0px;
+    padding-left: 5px;
+}
+body{
+    background: #f1f1f1;
+    margin : 0px;
+}
+header{
+    position : fixed;
+    display: none;
+    top : 0px;
+    left : 0;
+    right : 0px;
+    background: #E74C3C;
+    font-size: 12px;
+    padding : 6px 0px;
+    color : white;
+}
+
+#description-body{
+    padding : 0px;
+    position: fixed;
+    top : 0px;
+    bottom : 0px;
+    left : 0px;
+    right : 0px;
+    background: white;
+}
+#description-body ul#accessuerstack{
+    margin : 0px;
+    padding : 0px;
+    position : absolute;
+    left : 0px;
+    top : 0px;
+    bottom : 0px;
+    width : 350px;
+    background: #f7f7f7;
+    border-right: 3px solid transparent;
+ }
+#description-body ul#accessuerstack:hover{
+    overflow-y : auto;
+}
+#description-body ul#accessuerstack li{
+    display: block;
+}
+#description-body ul#accessuerstack div:first-child{
+    font-weight: bold;
+    margin-bottom: 6px;
+    color : #C0392B;
+}
+#description-body ul#accessuerstack p{
+    font-size: 11px;
+}
+#description-body ul#accessuerstack a{
+    position: relative;
+    display: block;
+    text-decoration: none;
+    color : #7F8C8D;
+    padding: 3px;
+    padding-bottom : 6px;
+    border-bottom: 1px solid #BDC3C7;
+}
+#description-body ul#accessuerstack a:hover div{
+    color : white;
+}
+#description-body ul#accessuerstack a:hover{
+    background: #D35400;
+    color : white;
+}
+#description-body ul#accessuerstack a.active:before{
+    content:"";
+    position: absolute;
+    right: -15px;
+    top: 26px;
+    width: 0;
+    height: 0;
+    border-top: 8px solid transparent;
+    border-left: 15px solid red;
+    border-bottom: 8px solid transparent;
+}
+#description-body ul#accessuerstack p{
+    display: inline-block;
+    margin : 0px;
+    margin-right : 5px;
+}
+#description-code{
+    position: absolute;
+    right: 0px;
+    left : 350px;
+    top : 0px;
+    bottom : 0px;
+    overflow: hidden;
+    overflow-y : auto;
+}
+#description-code ul{
+    list-style-type: decimal-leading-zero;
+}
+#description-code-header{
+    background: #343434;
+    color : white;
+    margin : 0px;
+    padding : 30px 10px;
+    border-left: 3px solid #D85650;
+}
+#description-code-header h2{
+    color: #D85650;
+}
+#description-code-header h4{
+
+}
+.filename{
+    display: block;
+    padding : 5px;
+}
+.filename div{
+    display: block;
+    padding : 10px 5px;
+    margin : 0px;
+    border-radius: 5px;
+    color : white;
+    box-shadow: 1px 1px 6px #7F8C8D;
+}
+.tab-pane, .panel-group{
+    background: #C9C9C9;
+    box-shadow: 1px 1px 15px #515151 inset;
+    border-left: 3px solid #2980B9;
+}
+.tab-pane ul{
+    list-style-position: inside;
+    background: #343434;
+    padding : 10px;
+    color : #BEC7C7;
+    border-radius: 5px;
+}
+.error-line{
+    background: #5E4444;
+}
+.error-char{
+    background: #D95459;
+    display: inline-block;
+    /*text-decoration: underline;*/
+    padding : 0px 5px;
+}
+.vrow{
+    border-bottom : 1px solid #D8CFBA;
+    padding: 8px 2px;
+}
+.vrow-value{
+    color : #16A085;
+}
+.vrow:hover{
+    background: #3A6F81;
+    color : white;
+}
+.vrow:hover .vrow-value{
+    color : white;
+}
+.panel-group .panel-title a{
+    display: block;
+}
+.panel-group{
+    padding : 10px;
+    border-color : #FFA800;
+}

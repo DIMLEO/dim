@@ -18,6 +18,8 @@ $Hash.check = $Hash.verify;
 
 $Auth = require('./Auth/Auth');
 
+require('./Response/Response');
+
 module.exports = function(env){
     return {
 

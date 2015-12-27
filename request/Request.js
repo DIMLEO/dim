@@ -1,6 +1,9 @@
 module.exports = function(){
 
     return {
+        host : function(){
+            return $_REQUEST.hostname;
+        },
         path : function(){
             return $_REQUEST.path;
         },
