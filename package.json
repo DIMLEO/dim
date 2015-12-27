@@ -1,6 +1,6 @@
 {
   "name": "elife-dim",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "module and package required to start express-life. Laravel structure For Express.js",
   "main": "index.js",
   "scripts": {
